@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LinkView</string>
+    <string name="notification_channel_name">屏幕共享</string>
+    <string name="notification_channel_desc">屏幕共享运行时显示的通知</string>
+    <string name="notification_title">LinkView 正在共享屏幕</string>
+    <string name="notification_text">点按返回应用或停止共享</string>
+    <string name="notification_stop">停止共享</string>
+</resources>

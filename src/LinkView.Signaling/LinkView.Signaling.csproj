@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>LinkView.Signaling</RootNamespace>
+    <AssemblyName>LinkView.Signaling</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LinkView.Core\LinkView.Core.csproj" />
+    <ProjectReference Include="..\LinkView.Protocol\LinkView.Protocol.csproj" />
+  </ItemGroup>
+</Project>

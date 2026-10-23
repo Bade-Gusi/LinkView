@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>0.9.0</Version>
+    <Company>LinkView</Company>
+    <Product>LinkView</Product>
+    <Copyright>Copyright (c) 2026 LinkView</Copyright>
+    <Deterministic>true</Deterministic>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <NoWarn>$(NoWarn);CA1707;CA1848;CA1873;CA1068</NoWarn>
+  </PropertyGroup>
+</Project>

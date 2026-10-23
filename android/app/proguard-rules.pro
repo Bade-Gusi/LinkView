@@ -1,0 +1,3 @@
+-keep class org.webrtc.** { *; }
+-keep class kotlinx.serialization.** { *; }
+-dontwarn org.webrtc.**

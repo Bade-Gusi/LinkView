@@ -1,0 +1,498 @@
+<UserControl x:Class="LinkView.Windows.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="32,0,32,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="196"/>
+            <ColumnDefinition Width="18"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Column="0" Style="{StaticResource Card}" Padding="6" VerticalAlignment="Top">
+            <ListBox Style="{StaticResource NavList}" ItemContainerStyle="{StaticResource SettingsNavItem}" ItemsSource="{Binding Sections}"
+                     SelectedValuePath="Key" SelectedValue="{Binding SelectedSectionKey, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0,4">
+                            <TextBlock Text="{Binding Name}" FontSize="12.5"/>
+                            <TextBlock Text="{Binding Description}" Style="{StaticResource Text.Caption}" FontSize="10"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <Grid Grid.Column="2" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="0,0,4,20" MaxWidth="760" HorizontalAlignment="Left">
+                    <!-- 校验提示 -->
+                    <Border Style="{StaticResource Banner.Error}" Margin="0,0,0,14"
+                            Visibility="{Binding HasErrors, Converter={StaticResource BoolToVisibility}}">
+                        <ItemsControl ItemsSource="{Binding Issues}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Message}" Foreground="{DynamicResource Brush.Danger}"
+                                               TextWrapping="Wrap" Margin="0,1"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+
+                    <!-- 基础 -->
+                    <StackPanel Visibility="{Binding SelectedSectionKey, Converter={StaticResource StringEqualsToVisibility}, ConverterParameter=general}">
+                        <TextBlock Text="基础设置" Style="{StaticResource Text.Hero}" FontSize="20"/>
+                        <TextBlock Text="设备名称会在下一次连接时告知对方。本版本不会写入系统启动项，也不会创建后台托盘。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,5,0,18"/>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="设备名称" FontWeight="Medium"/>
+                                <TextBlock Text="显示在配对码与连接请求中的名称" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" Style="{StaticResource TextBox.Base}" MaxLength="64"
+                                     Text="{Binding Draft.DeviceName, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="默认页面" FontWeight="Medium"/>
+                                <TextBlock Text="启动 LinkView 时打开的页面（重启后生效）" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox}" ItemsSource="{Binding DefaultPages}"
+                                      SelectedValuePath="Key" SelectedValue="{Binding Draft.DefaultPage}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+
+                        <Border Style="{StaticResource Banner.Info}" Margin="0,6,0,0">
+                            <TextBlock Text="本版本不申请开机启动或后台驻留权限。关闭窗口即退出应用；若正在共享，会先向你确认。"
+                                       TextWrapping="Wrap" Foreground="{DynamicResource Brush.TextSecondary}"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- 画质 -->
+                    <StackPanel Visibility="{Binding SelectedSectionKey, Converter={StaticResource StringEqualsToVisibility}, ConverterParameter=video}">
+                        <TextBlock Text="画质与编码" Style="{StaticResource Text.Hero}" FontSize="20"/>
+                        <TextBlock Text="这些设置在下一次开始共享时生效。当前构建使用软件 VP8 编码；分辨率和帧率上限由实际设备能力决定。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,5,0,18"/>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="画质预设" FontWeight="Medium"/>
+                                <TextBlock Text="快速在流畅、均衡与高清之间切换" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox}" ItemsSource="{Binding PresetOptions}"
+                                      SelectedItem="{Binding Draft.Preset}">
+                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Converter={StaticResource EnumLabel}}"/></DataTemplate></ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="最大分辨率" FontWeight="Medium"/>
+                                <TextBlock Text="超出时按比例缩小，不拉伸画面" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBox Style="{StaticResource TextBox.Base}" Text="{Binding Draft.MaxWidth, UpdateSourceTrigger=LostFocus}"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource TextBox.Base}" Text="{Binding Draft.MaxHeight, UpdateSourceTrigger=LostFocus}"/>
+                            </Grid>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="目标帧率" FontWeight="Medium"/>
+                                <TextBlock Text="采集端会按此帧率节流" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox}" ItemsSource="{Binding FpsOptions}"
+                                      SelectedItem="{Binding Draft.TargetFps}">
+                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding StringFormat={}{0} fps}"/></DataTemplate></ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="目标码率（kbps）" FontWeight="Medium"/>
+                                <TextBlock Text="VP8 编码器的目标带宽；网络拥塞时仍以稳定优先" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" Style="{StaticResource TextBox.Base}" Text="{Binding Draft.TargetBitrateKbps, UpdateSourceTrigger=LostFocus}"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="关键帧间隔（秒）" FontWeight="Medium"/>
+                                <TextBlock Text="按此间隔强制发送关键帧，帮助新接收端快速恢复" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" Style="{StaticResource TextBox.Base}" Text="{Binding Draft.KeyframeIntervalSeconds, UpdateSourceTrigger=LostFocus}"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="编码格式" FontWeight="Medium"/>
+                                <TextBlock Text="当前构建仅完成 VP8 的跨端互通验证" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox}" ItemsSource="{Binding CodecOptions}"
+                                      SelectedItem="{Binding Draft.Codec}">
+                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Converter={StaticResource EnumLabel}}"/></DataTemplate></ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+
+                        <Border Style="{StaticResource Banner.Warning}">
+                            <TextBlock Text="硬件编码、自适应码率/帧率、H.264 与裁剪填充模式尚未在当前构建中实现，因此不提供虚假开关。软件 VP8 会占用更多 CPU。"
+                                       TextWrapping="Wrap" Foreground="{DynamicResource Brush.TextSecondary}"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- 网络 -->
+                    <StackPanel Visibility="{Binding SelectedSectionKey, Converter={StaticResource StringEqualsToVisibility}, ConverterParameter=network}">
+                        <TextBlock Text="网络" Style="{StaticResource Text.Hero}" FontSize="20"/>
+                        <TextBlock Text="网络与 ICE 配置在下一次连接时生效。优先策略在首选协议族不可用时会回退到自动双栈。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,5,0,18"/>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="协议族偏好" FontWeight="Medium"/>
+                                <TextBlock Text="仅 IPv4 / 仅 IPv6 会过滤另一族的候选" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox}" ItemsSource="{Binding NetworkOptions}"
+                                      SelectedItem="{Binding Draft.NetworkPreference}">
+                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Converter={StaticResource EnumLabel}}"/></DataTemplate></ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="ICE 策略" FontWeight="Medium"/>
+                                <TextBlock Text="仅中继需要至少一个 TURN 服务器" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox}" ItemsSource="{Binding IceOptions}"
+                                      SelectedItem="{Binding Draft.IceTransport}">
+                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Converter={StaticResource EnumLabel}}"/></DataTemplate></ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+
+                        <TextBlock Text="STUN 服务器（每行一个）" FontWeight="Medium" Margin="0,4,0,4"/>
+                        <TextBox Style="{StaticResource TextBox.Base}" AcceptsReturn="True" MinHeight="74" TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto" FontFamily="{DynamicResource Font.Mono}" FontSize="12"
+                                 Text="{Binding Draft.StunServersText, UpdateSourceTrigger=LostFocus}"/>
+                        <TextBlock Text="示例：stun:stun.example.org:3478。STUN 只用于发现 NAT 映射，不保证一定能穿透。" Style="{StaticResource Text.Caption}" Margin="0,4,0,16"/>
+
+                        <TextBlock Text="TURN 服务器（可选）" FontWeight="Medium" Margin="0,4,0,4"/>
+                        <TextBox Style="{StaticResource TextBox.Base}" FontFamily="{DynamicResource Font.Mono}" FontSize="12"
+                                 Text="{Binding Draft.TurnUri, UpdateSourceTrigger=LostFocus}"/>
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <TextBox Style="{StaticResource TextBox.Base}" Text="{Binding Draft.TurnUsername, UpdateSourceTrigger=LostFocus}"/>
+                            <PasswordBox x:Name="TurnCredentialBox" Grid.Column="2" MinHeight="34" Padding="10,7"
+                                         Background="{DynamicResource Brush.SurfaceAlt}" BorderBrush="{DynamicResource Brush.Border}"
+                                         BorderThickness="1" Foreground="{DynamicResource Brush.Text}"
+                                         PasswordChanged="TurnCredential_OnPasswordChanged"/>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <CheckBox Style="{StaticResource CheckBox}" Content="删除已保存的 TURN 凭据"
+                                      IsChecked="{Binding Draft.ClearTurnCredential}"/>
+                            <TextBlock Text="{Binding CredentialHint}" Style="{StaticResource Text.Caption}" Margin="12,0,0,0"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="凭据不会写入 settings.json，而是通过 Windows DPAPI 保存在当前用户的安全存储中。"
+                                   Style="{StaticResource Text.Caption}" Margin="0,4,0,16" TextWrapping="Wrap"/>
+
+                        <TextBlock Text="信令服务" FontWeight="Medium" Margin="0,4,0,4"/>
+                        <TextBox Style="{StaticResource TextBox.Base}" FontFamily="{DynamicResource Font.Mono}" FontSize="12"
+                                 Text="{Binding Draft.SignalingServer, UpdateSourceTrigger=LostFocus}"/>
+                        <TextBlock Text="局域网连接也需要信令交换 SDP/ICE；信令服务不会接触媒体内容。"
+                                   Style="{StaticResource Text.Caption}" Margin="0,4,0,16"/>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="连接超时 / ICE 超时（秒）" FontWeight="Medium"/>
+                                <TextBlock Text="等待配对确认与 ICE 收集的上限" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBox Style="{StaticResource TextBox.Base}" Text="{Binding Draft.ConnectionTimeoutSeconds, UpdateSourceTrigger=LostFocus}"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource TextBox.Base}" Text="{Binding Draft.IceTimeoutSeconds, UpdateSourceTrigger=LostFocus}"/>
+                            </Grid>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="重连次数 / 初始延迟（ms）" FontWeight="Medium"/>
+                                <TextBlock Text="指数退避，超过次数后进入失败状态" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBox Style="{StaticResource TextBox.Base}" Text="{Binding Draft.ReconnectMaxAttempts, UpdateSourceTrigger=LostFocus}"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource TextBox.Base}" Text="{Binding Draft.ReconnectInitialDelayMs, UpdateSourceTrigger=LostFocus}"/>
+                            </Grid>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="局域网发现" FontWeight="Medium"/>
+                                <TextBlock Text="IPv4/IPv6 多播；更改后下次启动生效" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}" IsChecked="{Binding Draft.LanDiscoveryEnabled}"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- 连接与安全 -->
+                    <StackPanel Visibility="{Binding SelectedSectionKey, Converter={StaticResource StringEqualsToVisibility}, ConverterParameter=connection}">
+                        <TextBlock Text="连接与安全" Style="{StaticResource Text.Hero}" FontSize="20"/>
+                        <TextBlock Text="安全默认值：未经明确确认不会自动接受陌生设备。关闭确认会降低安全性。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,5,0,18"/>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="配对时需要本机确认" FontWeight="Medium"/>
+                                <TextBlock Text="关闭后，任何知道有效配对码的设备都可直接加入" Style="{StaticResource Text.Caption}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}" IsChecked="{Binding Draft.RequirePairingConfirmation}"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="网络中断后自动尝试恢复" FontWeight="Medium"/>
+                                <TextBlock Text="仅对已建立的会话执行 ICE 重启，不会无限重试" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <ToggleButton Grid.Column="1" Style="{StaticResource ToggleSwitch}" IsChecked="{Binding Draft.AutoReconnect}"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="200"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="配对码有效期（秒）" FontWeight="Medium"/>
+                                <TextBlock Text="范围 60–3600；到期后自动失效" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" Style="{StaticResource TextBox.Base}" Text="{Binding Draft.PairingCodeTtlSeconds, UpdateSourceTrigger=LostFocus}"/>
+                        </Grid>
+
+                        <Border Style="{StaticResource Banner.Info}" Margin="0,4,0,16">
+                            <StackPanel>
+                                <TextBlock Text="连接身份与加密" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Brush.TextSecondary}"
+                                           Text="设备身份由 ECDSA P-256 公钥指纹确定；信令认证使用一次性挑战签名。媒体通道使用 WebRTC DTLS-SRTP。配对码只用于授权加入会话，不能替代媒体加密。"/>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="剪贴板共享尚未实现，因此不提供相关开关。会话结束时临时状态会被清除。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <!-- 隐私 -->
+                    <StackPanel Visibility="{Binding SelectedSectionKey, Converter={StaticResource StringEqualsToVisibility}, ConverterParameter=privacy}">
+                        <TextBlock Text="隐私" Style="{StaticResource Text.Hero}" FontSize="20"/>
+                        <TextBlock Text="LinkView 默认不录制、不上传屏幕内容，也不会在日志中写入画面或凭据。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,5,0,18"/>
+
+                        <Border Style="{StaticResource Banner.Success}" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="屏幕内容只存在于内存与媒体通道中" FontWeight="SemiBold"/>
+                                <TextBlock Text="应用不会保存截图、视频文件或帧缓存到磁盘。" Style="{StaticResource Text.Caption}" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="200"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="连接历史保留天数" FontWeight="Medium"/>
+                                <TextBlock Text="0 表示不保留历史；收藏设备不受影响" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" Style="{StaticResource TextBox.Base}" Text="{Binding Draft.HistoryRetentionDays, UpdateSourceTrigger=LostFocus}"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="200"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="最近设备保留数量" FontWeight="Medium"/>
+                                <TextBlock Text="收藏设备不计入淘汰" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" Style="{StaticResource TextBox.Base}" Text="{Binding Draft.RecentDeviceLimit, UpdateSourceTrigger=LostFocus}"/>
+                        </Grid>
+
+                        <TextBlock Text="敏感信息脱敏（始终开启）" FontWeight="Medium"/>
+                        <TextBlock Text="日志写入前会移除 TURN 凭据、密码、令牌与配对码字段。导出诊断报告时会一并包含该脱敏规则。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <!-- 界面 -->
+                    <StackPanel Visibility="{Binding SelectedSectionKey, Converter={StaticResource StringEqualsToVisibility}, ConverterParameter=appearance}">
+                        <TextBlock Text="界面" Style="{StaticResource Text.Hero}" FontSize="20"/>
+                        <TextBlock Text="保存后立即应用到整个应用。主题会同步更新文本、边框、图标与图表颜色。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,5,0,18"/>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="主题" FontWeight="Medium"/>
+                                <TextBlock Text="跟随系统会读取 Windows 应用主题" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox}" ItemsSource="{Binding ThemeOptions}"
+                                      SelectedItem="{Binding Draft.Theme}">
+                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Converter={StaticResource EnumLabel}}"/></DataTemplate></ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+
+                        <TextBlock Text="强调色" FontWeight="Medium"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,16">
+                            <ItemsControl ItemsSource="{Binding AccentOptions}">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Width="26" Height="26" Margin="0,0,7,0" Cursor="Hand"
+                                                Command="{Binding DataContext.SetAccentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border CornerRadius="13" Background="{Binding Converter={StaticResource AccentColorToBrush}}"
+                                                            BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"/>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="{Binding Draft.AccentColor}" Style="{StaticResource Text.Mono}"
+                                       VerticalAlignment="Center" Margin="6,0,0,0"/>
+                        </StackPanel>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="动画强度" FontWeight="Medium"/>
+                                <TextBlock Text="关闭后页面切换与状态动效立即完成" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox}" ItemsSource="{Binding AnimationOptions}"
+                                      SelectedItem="{Binding Draft.Animations}">
+                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Converter={StaticResource EnumLabel}}"/></DataTemplate></ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="字号缩放" FontWeight="Medium"/>
+                                <TextBlock Text="0.8× 到 1.6×，保存后立即生效" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Slider Style="{StaticResource Slider}" Width="150" Minimum="0.8" Maximum="1.6"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="True" SmallChange="0.05"
+                                        Value="{Binding Draft.FontScale, Mode=TwoWay}"/>
+                                <TextBlock Text="{Binding Draft.FontScale, StringFormat={}{0:0.00}×}" VerticalAlignment="Center"
+                                           Margin="10,0,0,0" FontFamily="{DynamicResource Font.Mono}" FontSize="11"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="界面语言：简体中文。当前版本未提供其他语言包。" Style="{StaticResource Text.Caption}"/>
+                    </StackPanel>
+
+                    <!-- 性能 -->
+                    <StackPanel Visibility="{Binding SelectedSectionKey, Converter={StaticResource StringEqualsToVisibility}, ConverterParameter=performance}">
+                        <TextBlock Text="性能" Style="{StaticResource Text.Hero}" FontSize="20"/>
+                        <TextBlock Text="当前媒体管线为软件 VP8 编解码；硬件加速与视频后处理尚未启用。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,5,0,18"/>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="200"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="性能统计刷新间隔（毫秒）" FontWeight="Medium"/>
+                                <TextBlock Text="范围 250–10000；只影响界面刷新" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" Style="{StaticResource TextBox.Base}" Text="{Binding Draft.StatsRefreshMs, UpdateSourceTrigger=LostFocus}"/>
+                        </Grid>
+
+                        <Border Style="{StaticResource Banner.Warning}">
+                            <TextBlock Text="软件编码在 1080p60 下可能达到 CPU 上限。更稳妥的选择是 1080p30 或 720p60，并关注性能监控中的编码耗时。"
+                                       TextWrapping="Wrap" Foreground="{DynamicResource Brush.TextSecondary}"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- 诊断 -->
+                    <StackPanel Visibility="{Binding SelectedSectionKey, Converter={StaticResource StringEqualsToVisibility}, ConverterParameter=diagnostics}">
+                        <TextBlock Text="诊断与日志" Style="{StaticResource Text.Hero}" FontSize="20"/>
+                        <TextBlock Text="日志按模块与等级记录真实事件；媒体高频事件不会被逐帧写入。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,5,0,18"/>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="日志等级" FontWeight="Medium"/>
+                                <TextBlock Text="保存后立即生效" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <ComboBox Grid.Column="1" Style="{StaticResource ComboBox}" ItemsSource="{Binding LogLevelOptions}"
+                                      SelectedItem="{Binding Draft.LogLevel}">
+                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Converter={StaticResource EnumLabel}}"/></DataTemplate></ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="200"/></Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="日志保留天数" FontWeight="Medium"/>
+                                <TextBlock Text="过期文件在下次启动时清理" Style="{StaticResource Text.Caption}"/>
+                            </StackPanel>
+                            <TextBox Grid.Column="1" Style="{StaticResource TextBox.Base}" Text="{Binding Draft.LogRetentionDays, UpdateSourceTrigger=LostFocus}"/>
+                        </Grid>
+
+                        <TextBlock Text="日志与诊断页面可以筛选等级、复制单条日志，并导出已脱敏的诊断报告。报告包含网络接口、连接状态与配置摘要，不包含屏幕内容或凭据。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <!-- 实验性 -->
+                    <StackPanel Visibility="{Binding SelectedSectionKey, Converter={StaticResource StringEqualsToVisibility}, ConverterParameter=experimental}">
+                        <TextBlock Text="实验性功能" Style="{StaticResource Text.Hero}" FontSize="20"/>
+                        <TextBlock Text="当前版本没有启用任何绕过稳定性验证的实验性开关。"
+                                   Style="{StaticResource Text.Caption}" TextWrapping="Wrap" Margin="0,5,0,18"/>
+                        <Border Style="{StaticResource Banner.Info}">
+                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Brush.TextSecondary}"
+                                       Text="Windows.Graphics.Capture、VP8 软件编码、SIPSorcery WebRTC 与信令服务均已作为正式链路在 Windows 上验证。Android 客户端需要在具备 Android SDK 与真机的环境中完成独立构建和互通验证，相关状态会在交付报告中如实标注。"/>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- 保存栏 -->
+            <Border Grid.Row="1" Background="{DynamicResource Brush.Surface}" BorderBrush="{DynamicResource Brush.Border}"
+                    BorderThickness="0,1,0,0" Padding="0,12" Margin="0,0,0,0">
+                <Grid>
+                    <TextBlock Text="{Binding StatusText}" Style="{StaticResource Text.Caption}" VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" MaxWidth="360" HorizontalAlignment="Left"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="导入" Style="{StaticResource Button.Ghost}" Command="{Binding ImportCommand}"/>
+                        <Button Content="导出" Style="{StaticResource Button.Ghost}" Command="{Binding ExportCommand}"/>
+                        <Button Content="恢复默认" Style="{StaticResource Button.Ghost}" Command="{Binding ResetDefaultsCommand}"/>
+                        <Button Content="保存设置" Style="{StaticResource Button.Primary}" MinWidth="108" Margin="8,0,0,0"
+                                Command="{Binding SaveCommand}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

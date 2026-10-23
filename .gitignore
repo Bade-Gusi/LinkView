@@ -1,0 +1,19 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+
+# Android
+android/local.properties
+android/.gradle/
+android/app/build/
+android/build/
+*.apk
+*.aab
+
+# Verification / build artifacts
+_screenshots/
+dist/
+*.tmp
+*.log

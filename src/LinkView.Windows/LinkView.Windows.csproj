@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <PlatformTarget>x64</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>LinkView.Windows</RootNamespace>
+    <AssemblyName>LinkView</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.13" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.13" />
+    <PackageReference Include="SIPSorcery" Version="10.0.17" />
+    <PackageReference Include="Vortice.Direct3D11" Version="3.8.3" />
+    <PackageReference Include="Vortice.DXGI" Version="3.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LinkView.Core\LinkView.Core.csproj" />
+    <ProjectReference Include="..\LinkView.Protocol\LinkView.Protocol.csproj" />
+    <ProjectReference Include="..\LinkView.Media.Vp8\LinkView.Media.Vp8.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,6 +1,10 @@
 # LinkView
 
+[![CI](https://github.com/Bade-Gusi/LinkView/actions/workflows/ci.yml/badge.svg)](https://github.com/Bade-Gusi/LinkView/actions/workflows/ci.yml)
+
 Professional peer-to-peer screen sharing for Windows and Android, built on standard WebRTC with VP8 video, .NET 10/WPF, and Kotlin/Jetpack Compose.
+
+The Android APK is available under [Releases](https://github.com/Bade-Gusi/LinkView/releases/tag/v0.9.0).
 
 LinkView focuses on explicit pairing, clear connection state, real diagnostics, and truthful reporting of what the implementation can and cannot do. It is an engineering preview, not a finished commercial product.
 
